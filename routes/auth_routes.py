@@ -19,7 +19,7 @@ def login():
     if not usuario:
         return jsonify({
             "erro": "Email ou senha inválidos"
-        }), 404
+        }), 401
 
     if not check_password_hash(usuario.senha, senha):
         return jsonify({

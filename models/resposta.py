@@ -4,16 +4,39 @@ from extensions import db
 class Resposta(db.Model):
     __tablename__ = "resposta"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
-    mensagem = db.Column(db.Text, nullable=False)
+    mensagem = db.Column(
+        db.Text,
+        nullable=False
+    )
 
-    data_resposta = db.Column(db.DateTime, default=datetime.utcnow)
+    data_resposta = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
 
-    administrador_id = db.Column(db.Integer, db.ForeignKey('administradores.id'), nullable=False)
+    administrador_id = db.Column(
+        db.Integer,
+        db.ForeignKey("usuarios.id"),
+        nullable=False
+    )
 
+    reclamacao_id = db.Column(
+        db.Integer,
+        db.ForeignKey("reclamacoes.id"),
+        nullable=False
+    )
 
-    reclamacao_id = db.Column(db.Integer, db.ForeignKey('reclamacoes.id'), nullable=False)
+    administrador = db.relationship(
+        "Usuario",
+        foreign_keys=[administrador_id]
+    )
 
-    def __repr__(self):
-        return f"<Resposta {self.id}>"
+    reclamacao = db.relationship(
+        "Reclamacao",
+        backref="respostas"
+    )
