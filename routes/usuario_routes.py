@@ -1,107 +1,103 @@
 from flask import Blueprint, request, jsonify
-from extensions import db
-from models.usuario import Usuario
+
 from werkzeug.security import generate_password_hash
 from flask_jwt_extended import jwt_required, get_jwt_identity
+
+from utils.decorators import admin_required
+
+
+from services.usuario_service import *
 
 
 usuario_bp = Blueprint("usuario", __name__)
 
 @usuario_bp.route("/usuarios", methods=["POST"])
-def criar_usuario():
+def criar_usuario_route():
     try:
-        dados = request.json
 
-        senha_hash = generate_password_hash(dados["senha"])
-        novo_usuario = Usuario(
-            nome=dados["nome"],
-            email=dados["email"],
-            senha=senha_hash
+        validar_criacao_usuario(dados)
+
+        usuario = criar_usuario(
+            nome,
+            email,
+            senha
         )
 
-        db.session.add(novo_usuario)
-        db.session.commit()
+        return jsonify(
+            usuario.to_dict()
+        ), 201
 
-        return jsonify({
-            "mensagem": "Usuário criado com sucesso"
-        }), 201
+    except ValueError as erro:
 
-    except Exception as erro:
         return jsonify({
             "erro": str(erro)
-        }), 500
+        }), 400
 
 @usuario_bp.route("/usuarios", methods=["GET"])
 @jwt_required()
-def listar_usuarios():
-    try:
-        usuarios = Usuario.query.all()
+@admin_required
+def listar_usuarios_route():
 
-        lista = []
+    usuarios = listar_usuarios()
 
-        for usuario in usuarios:
-            lista.append({
-                "id": usuario.id,
-                "nome": usuario.nome,
-                "email": usuario.email,
-                "perfil": usuario.perfil
-            })
-
-        return jsonify(lista), 200
-    except Exception as erro:
-        return jsonify({
-            "erro": str(erro)
-        }), 500
+    return jsonify([
+        usuario.to_dict()
+        for usuario in usuarios
+    ]), 200
 
 @usuario_bp.route("/usuarios/<int:id>", methods=["GET"])
-def buscar_usuario(id):
+@jwt_required()
+def buscar_usuario_routes(id):
+
     try:
-        usuario = Usuario.query.get(id)
+        usuario_logado = get_jwt_identity()
+
+        if str(usuario_logado) != str(id) and not is_admin():
+            return jsonify({
+                "erro": "Acesso negado."
+            }), 403
+
+        usuario = buscar_usuario(id)
+
         if not usuario:
             return jsonify({
                 "erro": "Usuário não encontrado"
             }), 404
-        return jsonify({
-            "id": usuario.id,
-            "nome": usuario.nome,
-            "email": usuario.email,
-            "perfil": usuario.perfil
-        }),200
+        return jsonify(usuario.to_dict()),200
+
     except Exception as erro:
         return jsonify({
             "erro": str(erro)
         }),500
 @usuario_bp.route("/usuarios/<int:id>", methods=["PUT"])
-def atualizar_usuario(id):
+@jwt_required()
+def atualizar_usuario_routes(id):
     try:
         usuario = Usuario.query.get(id)
+        usuario_logado = get_jwt_identity()
+
+        if (
+                str(usuario_logado) != str(id)
+                and not is_admin()
+        ):
+            return jsonify({
+                "erro": "Acesso negado."
+            }), 403
 
         if not usuario:
             return jsonify({
                 "erro": "Usuário não encontrado"
             }), 404
 
-        dados = request.json
+        dados = request.get_json()
 
-        usuario.nome = dados.get(
-            "nome",
-            usuario.nome
+        atualizar_usuario(
+            usuario,
+            dados
         )
-
-        usuario.email = dados.get(
-            "email",
-            usuario.email
-        )
-
-        usuario.senha = dados.get(
-            "senha",
-            usuario.senha
-        )
-
-        db.session.commit()
 
         return jsonify({
-            "mensagem": "Usuário atualizado com sucesso"
+            "mensagem": "Usuário atualizado com sucesso."
         }), 200
 
     except Exception as erro:
@@ -109,17 +105,26 @@ def atualizar_usuario(id):
             "erro": str(erro)
         }), 500
 @usuario_bp.route("/usuarios/<int:id>", methods=["DELETE"])
-def deletar_usuario(id):
+@jwt_required()
+def deletar_usuario_routes(id):
     try:
         usuario = Usuario.query.get(id)
+        usuario_logado = get_jwt_identity()
+
+        if (
+                str(usuario_logado) != str(id)
+                and not is_admin()
+        ):
+            return jsonify({
+                "erro": "Acesso negado."
+            }), 403
 
         if not usuario:
             return jsonify({
                 "erro": "Usuário não encontrado"
             }), 404
 
-        db.session.delete(usuario)
-        db.session.commit()
+        excluir_usuario(usuario)
 
         return jsonify({
             "mensagem": "Usuário removido com sucesso"
@@ -138,36 +143,20 @@ def meu_perfil ():
 
     usuario = Usuario.query.get(usuario_id)
 
-    return jsonify({
-        "id": usuario.id,
-        "nome": usuario.nome,
-        "email": usuario.email,
-        "perfil": usuario.perfil
-    }), 200
+    return jsonify(usuario.to_dict()), 200
 
 @usuario_bp.route("/admin", methods=["GET"])
 @jwt_required()
+@admin_required
 def painel_admin():
 
-    usuario_id = get_jwt_identity()
+    usuario = buscar_usuario(usuario_id)
 
-    usuario = Usuario.query.get(usuario_id)
 
-    if not usuario:
+    if not usuario_id:
         return jsonify({
             "erro": "Email ou senha invalidos"
         }), 404
 
-    if usuario.perfil != "administrador":
-        return jsonify({
-            "erro": f"Acesso negado. Apenas administradores podem acessar."
-        }), 403
-    return jsonify({
-        "mensagem": f"Bem-vindo ao painel administrativo. {usuario.nome}!",
-        "usuario": {
-            "id": usuario.id,
-            "nome": usuario.nome,
-            "email": usuario.email,
-            "perfil": usuario.perfil
-        }
-    }), 200
+
+    return jsonify(usuario.to_dict()), 200

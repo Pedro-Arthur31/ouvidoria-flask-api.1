@@ -16,7 +16,8 @@ class Resposta(db.Model):
 
     data_resposta = db.Column(
         db.DateTime,
-        default=datetime.utcnow
+        default=datetime.utcnow,
+        nullable=False
     )
 
     administrador_id = db.Column(
@@ -38,5 +39,14 @@ class Resposta(db.Model):
 
     reclamacao = db.relationship(
         "Reclamacao",
-        backref="respostas"
+        back_populates="respostas"
     )
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "mensagem": self.mensagem,
+            "administrador_id": self.administrador_id,
+            "reclamacao_id": self.reclamacao_id,
+            "data_resposta": self.data_resposta.isoformat()
+        }

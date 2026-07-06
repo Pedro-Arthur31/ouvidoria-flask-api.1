@@ -27,7 +27,8 @@ def login():
         }), 401
 
     token = create_access_token(
-        identity=str(usuario.id)
+        identity=str(usuario.id),
+        additional_claims={"tipo": usuario.tipo}
     )
 
     return jsonify({

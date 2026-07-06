@@ -28,11 +28,6 @@ app.register_blueprint(reclamacao_bp)
 
 app.register_blueprint(resposta_bp)
 
-import models.usuario
-import models.reclamacao
-import models.resposta
-
-
 with app.app_context():
     db.create_all()
     print("Tabelas criadas!")

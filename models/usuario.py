@@ -12,15 +12,23 @@ class Usuario(db.Model):
 
     senha = db.Column (db.String(255),nullable=False)
 
-    perfil = db.Column (db.String(20),default="usuario")
+    tipo = db.Column (db.String(20),default="usuario")
 
-    data_criacao = db.Column (db.DateTime,default=datetime.utcnow)
+    data_criacao = db.Column (db.DateTime,default=datetime.utcnow,nullable=False)
 
     def __repr__(self):
         return f'<Usuario {self.nome}>'
 
     reclamacoes = db.relationship(
         "Reclamacao",
-        backref="usuario",
-        lazy=True
+        back_populates="usuario",
+        cascade="all, delete-orphan",
     )
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "nome": self.nome,
+            "email": self.email,
+            "tipo": self.tipo,
+            "data_criacao": self.data_criacao.isoformat()
+        }

@@ -1,76 +1,256 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from extensions import db
-from models.reclamacao import Reclamacao
+from utils.decorators import admin_required
+from utils.security import is_admin
+
+from services.reclamacao_service import (
+    criar_reclamacao_service,
+    listar_reclamacoes_service,
+    listar_reclamacoes_usuario_service,
+    buscar_reclamacao_service,
+    atualizar_reclamacao_service,
+    atualizar_status_service,
+    excluir_reclamacao_service
+)
+
+from validators.reclamacao_validator import (
+    validar_criacao_reclamacao,
+    validar_atualizacao_reclamacao,
+    validar_status
+)
 
 reclamacao_bp = Blueprint(
     "reclamacao",
-    __name__,
+    __name__
 )
 
-@reclamacao_bp.route(
-    "/reclamacoes",
-    methods=["POST"]
-)
-
+@reclamacao_bp.route("/reclamacoes", methods=["POST"])
 @jwt_required()
-def criar_reclamacao():
-    dados = request.get_json()
+def criar_reclamacao_route():
 
-    usuario_id = get_jwt_identity()
+    try:
 
-    nova_reclamacao = Reclamacao(
-        titulo=dados["titulo"],
-        descricao=dados["descricao"],
-        usuario_id=usuario_id
-    )
+        dados = request.get_json()
 
-    db.session.add(
-        nova_reclamacao
-    )
+        validar_criacao_reclamacao(dados)
 
-    db.session.commit()
+        usuario_id = get_jwt_identity()
 
-    return jsonify({
-        "Parabens": "Reclamação criada com sucesso"
-    }), 201
+        reclamacao = criar_reclamacao_service(
+            titulo=dados["titulo"],
+            descricao=dados["descricao"],
+            usuario_id=usuario_id
+        )
+
+        return jsonify(
+            reclamacao.to_dict()
+        ), 201
+
+    except ValueError as erro:
+
+        return jsonify({
+            "erro": str(erro)
+        }), 400
 
 @reclamacao_bp.route("/reclamacoes", methods=["GET"])
-
 @jwt_required()
-def listar_reclamacao():
+def listar_reclamacoes_route():
 
-    reclamacoes = Reclamacao.query.all()
+    try:
 
-    lista = []
+        if is_admin():
 
-    for reclamacao in reclamacoes:
-        lista.append({
-            "id": reclamacao.id,
-            "titulo": reclamacao.titulo,
-            "descricao": reclamacao.descricao,
-            "status": reclamacao.status,
-            "usuario_id": reclamacao.usuario_id
-        })
+            reclamacoes = listar_reclamacoes_service()
 
-        return jsonify(lista), 200
+        else:
+
+            usuario_id = get_jwt_identity()
+
+            reclamacoes = listar_reclamacoes_usuario_service(
+                usuario_id
+            )
+
+        return jsonify([
+            r.to_dict()
+            for r in reclamacoes
+        ]), 200
+
+    except Exception as erro:
+
+        return jsonify({
+            "erro": str(erro)
+        }), 500
+@reclamacao_bp.route("/reclamacoes/<int:id>", methods=["GET"])
+@jwt_required()
+def buscar_reclamacao_route(id):
+
+    try:
+
+        reclamacao = buscar_reclamacao_service(id)
+
+        usuario_id = get_jwt_identity()
+
+        if (
+            str(reclamacao.usuario_id) != str(usuario_id)
+            and not is_admin()
+        ):
+            return jsonify({
+                "erro": "Acesso negado."
+            }), 403
+
+        return jsonify(
+            reclamacao.to_dict()
+        ), 200
+
+    except ValueError as erro:
+
+        return jsonify({
+            "erro": str(erro)
+        }), 404
 
 @reclamacao_bp.route("/minhas-reclamacoes", methods=["GET"])
 @jwt_required()
-def minha_reclamacoes():
+def minhas_reclamacoes_route():
 
-    usuario_id = get_jwt_identity()
+    try:
 
-    reclamacoes = Reclamacao.query.filter_by(usuario_id=usuario_id).all()
+        usuario_id = get_jwt_identity()
 
-    lista = []
+        reclamacoes = listar_reclamacoes_usuario_service(
+            usuario_id
+        )
 
-    for reclamacao in reclamacoes:
-        lista.append({
-            "id": reclamacao.id,
-            "titulo": reclamacao.titulo,
-            "status": reclamacao.status,
-        })
+        return jsonify([
+            r.to_dict()
+            for r in reclamacoes
+        ]), 200
 
-        return jsonify(lista), 200
+    except Exception as erro:
+
+        return jsonify({
+            "erro": str(erro)
+        }), 500
+
+@reclamacao_bp.route("/reclamacoes/<int:id>/status", methods=["PATCH"])
+@jwt_required()
+@admin_required
+def alterar_status_route(id):
+
+    try:
+
+        dados = request.get_json()
+
+        novo_status = dados.get("status")
+
+        validar_status(novo_status)
+
+        reclamacao = buscar_reclamacao_service(id)
+
+        atualizar_status_service(
+            reclamacao,
+            novo_status
+        )
+
+        return jsonify({
+            "mensagem": "Status atualizado com sucesso."
+        }), 200
+
+    except ValueError as erro:
+
+        return jsonify({
+            "erro": str(erro)
+        }), 400
+
+@reclamacao_bp.route("/reclamacoes/<int:id>", methods=["PUT"])
+@jwt_required()
+def atualizar_reclamacao_route(id):
+
+    try:
+
+        reclamacao = buscar_reclamacao_service(id)
+
+        usuario_id = get_jwt_identity()
+
+        if (
+            str(reclamacao.usuario_id) != str(usuario_id)
+            and not is_admin()
+        ):
+            return jsonify({
+                "erro": "Acesso negado."
+            }), 403
+
+        if reclamacao.status == "fechada":
+
+            return jsonify({
+                "erro": "Reclamação fechada não pode ser alterada."
+            }), 403
+
+        dados = request.get_json()
+
+        validar_atualizacao_reclamacao(dados)
+
+        atualizar_reclamacao_service(
+            reclamacao,
+            dados
+        )
+
+        return jsonify({
+            "mensagem": "Reclamação atualizada com sucesso."
+        }), 200
+
+    except ValueError as erro:
+
+        return jsonify({
+            "erro": str(erro)
+        }), 400
+
+@reclamacao_bp.route("/reclamacoes/<int:id>", methods=["DELETE"])
+@jwt_required()
+def deletar_reclamacao_route(id):
+
+    try:
+
+        reclamacao = buscar_reclamacao_service(id)
+
+        usuario_id = get_jwt_identity()
+
+        if (
+            str(reclamacao.usuario_id) != str(usuario_id)
+            and not is_admin()
+        ):
+            return jsonify({
+                "erro": "Acesso negado."
+            }), 403
+
+        excluir_reclamacao_service(
+            reclamacao
+        )
+
+        return jsonify({
+            "mensagem": "Reclamação removida com sucesso."
+        }), 200
+
+    except ValueError as erro:
+
+        return jsonify({
+            "erro": str(erro)
+        }), 404
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
