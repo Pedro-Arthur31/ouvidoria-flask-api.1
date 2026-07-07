@@ -17,7 +17,7 @@ def criar_resposta(
         reclamacao_id=reclamacao.id
     )
 
-    reclamacao.status = StatusReclamacao.RESPONDIDA.value
+    reclamacao.status = StatusReclamacao.RESPONDIDA
 
     db.session.add(resposta)
 

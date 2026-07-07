@@ -142,7 +142,7 @@ def alterar_status_route(id):
 
         dados = request.get_json()
 
-        validar_status(dados)
+        validar_status(dados["status"])
 
         reclamacao = buscar_reclamacao_service(id)
 
@@ -161,3 +161,75 @@ def alterar_status_route(id):
         return jsonify({
             "erro": str(erro)
         }), 400
+@reclamacao_bp.route("/reclamacoes/<int:id>", methods=["PUT"])
+@jwt_required()
+def atualizar_reclamacao_route(id):
+
+    try:
+
+        reclamacao = buscar_reclamacao_service(id)
+
+        usuario_id = get_jwt_identity()
+
+        if (
+            str(reclamacao.usuario_id) != str(usuario_id)
+            and not is_admin()
+        ):
+            return jsonify({
+                "erro": "Acesso negado."
+            }), 403
+
+        if reclamacao.status == "fechada":
+            return jsonify({
+                "erro": "Reclamação fechada não pode ser alterada."
+            }), 403
+
+        dados = request.get_json()
+
+        validar_atualizacao_reclamacao(dados)
+
+        atualizar_reclamacao_service(
+            reclamacao,
+            dados
+        )
+
+        return jsonify({
+            "mensagem": "Reclamação atualizada com sucesso."
+        }), 200
+
+    except ValueError as erro:
+
+        return jsonify({
+            "erro": str(erro)
+        }), 400
+@reclamacao_bp.route("/reclamacoes/<int:id>", methods=["DELETE"])
+@jwt_required()
+def excluir_reclamacao_route(id):
+
+    try:
+
+        reclamacao = buscar_reclamacao_service(id)
+
+        usuario_id = get_jwt_identity()
+
+        if (
+            str(reclamacao.usuario_id) != str(usuario_id)
+            and not is_admin()
+        ):
+            return jsonify({
+                "erro": "Acesso negado."
+            }), 403
+
+        excluir_reclamacao_service(
+            reclamacao
+        )
+
+        return jsonify({
+            "mensagem": "Reclamação removida com sucesso."
+        }), 200
+
+    except ValueError as erro:
+
+        return jsonify({
+            "erro": str(erro)
+        }), 404
