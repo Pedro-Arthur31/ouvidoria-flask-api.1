@@ -1,0 +1,22 @@
+# Ambiente virtual
+.venv/
+
+# PyCharm
+.idea/
+
+# Cache
+__pycache__/
+*.pyc
+
+# Variáveis de ambiente
+.env
+
+# Banco SQLite (caso utilize futuramente)
+*.db
+
+# Logs
+*.log
+
+# Sistema
+.DS_Store
+Thumbs.db
