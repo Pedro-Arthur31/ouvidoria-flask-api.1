@@ -7,19 +7,29 @@ def validar_criacao_reclamacao(dados):
     descricao = dados.get("descricao")
 
     if not titulo:
-        raise ValueError("O título é obrigatório.")
+        raise ValueError(
+            "Título é obrigatório."
+        )
 
     if len(titulo.strip()) < 5:
-        raise ValueError("O título deve possuir pelo menos 5 caracteres.")
+        raise ValueError(
+            "Título muito curto."
+        )
 
     if len(titulo.strip()) > 150:
-        raise ValueError("O título deve possuir no máximo 150 caracteres.")
+        raise ValueError(
+            "Título muito grande."
+        )
 
     if not descricao:
-        raise ValueError("A descrição é obrigatória.")
+        raise ValueError(
+            "Descrição obrigatória."
+        )
 
     if len(descricao.strip()) < 15:
-        raise ValueError("A descrição deve possuir pelo menos 15 caracteres.")
+        raise ValueError(
+            "Descrição muito pequena."
+        )
 
 
 def validar_atualizacao_reclamacao(dados):
@@ -29,31 +39,36 @@ def validar_atualizacao_reclamacao(dados):
         titulo = dados["titulo"]
 
         if not titulo.strip():
-            raise ValueError("O título não pode ficar vazio.")
+            raise ValueError("Título inválido.")
 
         if len(titulo.strip()) < 5:
-            raise ValueError("O título deve possuir pelo menos 5 caracteres.")
-
-        if len(titulo.strip()) > 150:
-            raise ValueError("O título deve possuir no máximo 150 caracteres.")
+            raise ValueError(
+                "Título muito curto."
+            )
 
     if "descricao" in dados:
 
         descricao = dados["descricao"]
 
         if not descricao.strip():
-            raise ValueError("A descrição não pode ficar vazia.")
+            raise ValueError(
+                "Descrição inválida."
+            )
 
         if len(descricao.strip()) < 15:
-            raise ValueError("A descrição deve possuir pelo menos 15 caracteres.")
+            raise ValueError(
+                "Descrição muito pequena."
+            )
 
 
 def validar_status(status):
 
     if not status:
-        raise ValueError("O status é obrigatório.")
+        raise ValueError(
+            "Status obrigatório."
+        )
 
     if status not in STATUS_VALIDOS:
         raise ValueError(
-            f"Status inválido. Status permitidos: {', '.join(STATUS_VALIDOS)}"
+            "Status inválido."
         )

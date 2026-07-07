@@ -1,29 +1,63 @@
-def validar_criacao_resposta(dados):
+from extensions import db
 
-    mensagem = dados.get("mensagem")
+from models.resposta import Resposta
 
-    if not mensagem:
-        raise ValueError("A mensagem é obrigatória.")
-
-    if len(mensagem.strip()) < 5:
-        raise ValueError(
-            "A resposta deve possuir pelo menos 5 caracteres."
-        )
-
-    if "reclamacao_id" not in dados:
-        raise ValueError("O ID da reclamação é obrigatório.")
+from utils.status import StatusReclamacao
 
 
-def validar_atualizacao_resposta(dados):
+def criar_resposta(
+        mensagem,
+        administrador_id,
+        reclamacao
+):
+
+    resposta = Resposta(
+        mensagem=mensagem,
+        administrador_id=administrador_id,
+        reclamacao_id=reclamacao.id
+    )
+
+    reclamacao.status = StatusReclamacao.RESPONDIDA.value
+
+    db.session.add(resposta)
+
+    db.session.commit()
+
+    return resposta
+
+
+def listar_respostas_reclamacao(id):
+
+    return Resposta.query.filter_by(
+        reclamacao_id=id
+    ).all()
+
+
+def buscar_resposta(id):
+
+    resposta = Resposta.query.get(id)
+
+    if not resposta:
+        raise ValueError("Resposta não encontrada.")
+
+    return resposta
+
+
+def atualizar_resposta(
+        resposta,
+        dados
+):
 
     if "mensagem" in dados:
+        resposta.mensagem = dados["mensagem"]
 
-        mensagem = dados["mensagem"]
+    db.session.commit()
 
-        if not mensagem.strip():
-            raise ValueError("A mensagem não pode ficar vazia.")
+    return resposta
 
-        if len(mensagem.strip()) < 5:
-            raise ValueError(
-                "A resposta deve possuir pelo menos 5 caracteres."
-            )
+
+def excluir_resposta(resposta):
+
+    db.session.delete(resposta)
+
+    db.session.commit()

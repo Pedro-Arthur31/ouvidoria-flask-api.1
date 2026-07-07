@@ -1,8 +1,9 @@
-from datetime import datetime
 from extensions import db
+from datetime import datetime
+
 
 class Resposta(db.Model):
-    __tablename__ = "resposta"
+    __tablename__ = "respostas"
 
     id = db.Column(
         db.Integer,
@@ -34,7 +35,7 @@ class Resposta(db.Model):
 
     administrador = db.relationship(
         "Usuario",
-        foreign_keys=[administrador_id]
+        back_populates="respostas"
     )
 
     reclamacao = db.relationship(
@@ -48,5 +49,5 @@ class Resposta(db.Model):
             "mensagem": self.mensagem,
             "administrador_id": self.administrador_id,
             "reclamacao_id": self.reclamacao_id,
-            "data_resposta": self.data_resposta.isoformat()
+            "data_resposta": self.data_resposta.strftime("%d/%m/%Y %H:%M")
         }

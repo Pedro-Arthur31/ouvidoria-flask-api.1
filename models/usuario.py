@@ -1,34 +1,61 @@
-from datetime import datetime
 from extensions import db
+from datetime import datetime
+
 
 class Usuario(db.Model):
-    __tablename__ = 'usuarios'
+    __tablename__ = "usuarios"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
-    nome = db.Column (db.String(100),nullable=False)
+    nome = db.Column(
+        db.String(100),
+        nullable=False
+    )
 
-    email = db.Column (db.String(150),unique=True,nullable=False)
+    email = db.Column(
+        db.String(120),
+        unique=True,
+        nullable=False
+    )
 
-    senha = db.Column (db.String(255),nullable=False)
+    senha = db.Column(
+        db.String(255),
+        nullable=False
+    )
 
-    tipo = db.Column (db.String(20),default="usuario")
+    tipo = db.Column(
+        db.String(20),
+        nullable=False,
+        default="usuario"
+    )
 
-    data_criacao = db.Column (db.DateTime,default=datetime.utcnow,nullable=False)
-
-    def __repr__(self):
-        return f'<Usuario {self.nome}>'
+    data_criacao = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        nullable=False
+    )
 
     reclamacoes = db.relationship(
         "Reclamacao",
         back_populates="usuario",
-        cascade="all, delete-orphan",
+        lazy=True,
+        cascade="all, delete-orphan"
     )
+
+    respostas = db.relationship(
+        "Resposta",
+        back_populates="administrador",
+        lazy=True
+    )
+
     def to_dict(self):
         return {
             "id": self.id,
             "nome": self.nome,
             "email": self.email,
             "tipo": self.tipo,
-            "data_criacao": self.data_criacao.isoformat()
+            "data_criacao": self.data_criacao.strftime("%d/%m/%Y %H:%M")
         }

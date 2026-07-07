@@ -1,5 +1,6 @@
-from datetime import datetime
 from extensions import db
+from datetime import datetime
+
 
 class Reclamacao(db.Model):
     __tablename__ = "reclamacoes"
@@ -20,7 +21,8 @@ class Reclamacao(db.Model):
     )
 
     status = db.Column(
-        db.String(20),
+        db.String(30),
+        nullable=False,
         default="aberta"
     )
 
@@ -36,13 +38,18 @@ class Reclamacao(db.Model):
         nullable=False
     )
 
-    respostass = db.relationship(
-        "Resposta", back_populates="reclamacao", cascade="all, delete-orphan"
-    )
     usuario = db.relationship(
         "Usuario",
         back_populates="reclamacoes"
     )
+
+    respostas = db.relationship(
+        "Resposta",
+        back_populates="reclamacao",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -50,5 +57,5 @@ class Reclamacao(db.Model):
             "descricao": self.descricao,
             "status": self.status,
             "usuario_id": self.usuario_id,
-            "data_criacao": self.data_criacao.isoformat()
+            "data_criacao": self.data_criacao.strftime("%d/%m/%Y %H:%M")
         }

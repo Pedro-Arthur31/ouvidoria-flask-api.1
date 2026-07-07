@@ -1,57 +1,47 @@
-from extensions import db
-from models.usuario import Usuario
 from werkzeug.security import generate_password_hash
 
-def buscar_usuario(id):
+from extensions import db
+from models.usuario import Usuario
 
-    return Usuario.query.get(id)
-
-def listar_usuarios():
-    return Usuario.query.all()
-
-def excluir_usuario(usuario):
-
-    db.session.delete(usuario)
-
-    db.session.commit()
 
 def criar_usuario(nome, email, senha):
-
-    usuario_existente = Usuario.query.filter_by(
-        email=email
-    ).first()
-
-    if usuario_existente:
-        raise ValueError("Email já cadastrado.")
-
-    senha_hash = generate_password_hash(senha)
 
     usuario = Usuario(
         nome=nome,
         email=email,
-        senha=senha_hash
+        senha=generate_password_hash(senha)
     )
 
     db.session.add(usuario)
-
     db.session.commit()
 
     return usuario
 
+
+def listar_usuarios():
+
+    return Usuario.query.all()
+
+
+def buscar_usuario(id):
+
+    usuario = Usuario.query.get(id)
+
+    if not usuario:
+        raise ValueError("Usuário não encontrado.")
+
+    return usuario
+
+
 def atualizar_usuario(usuario, dados):
 
-    usuario.nome = dados.get(
-        "nome",
-        usuario.nome
-    )
+    if "nome" in dados:
+        usuario.nome = dados["nome"]
 
-    usuario.email = dados.get(
-        "email",
-        usuario.email
-    )
+    if "email" in dados:
+        usuario.email = dados["email"]
 
     if "senha" in dados:
-
         usuario.senha = generate_password_hash(
             dados["senha"]
         )
@@ -59,3 +49,10 @@ def atualizar_usuario(usuario, dados):
     db.session.commit()
 
     return usuario
+
+
+def excluir_usuario(usuario):
+
+    db.session.delete(usuario)
+
+    db.session.commit()

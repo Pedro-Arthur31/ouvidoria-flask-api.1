@@ -1,5 +1,9 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
+
+from flask_jwt_extended import (
+    jwt_required,
+    get_jwt_identity
+)
 
 from utils.decorators import admin_required
 from utils.security import is_admin
@@ -24,7 +28,6 @@ reclamacao_bp = Blueprint(
     "reclamacao",
     __name__
 )
-
 @reclamacao_bp.route("/reclamacoes", methods=["POST"])
 @jwt_required()
 def criar_reclamacao_route():
@@ -59,21 +62,21 @@ def listar_reclamacoes_route():
 
     try:
 
+        usuario_id = get_jwt_identity()
+
         if is_admin():
 
             reclamacoes = listar_reclamacoes_service()
 
         else:
 
-            usuario_id = get_jwt_identity()
-
             reclamacoes = listar_reclamacoes_usuario_service(
                 usuario_id
             )
 
         return jsonify([
-            r.to_dict()
-            for r in reclamacoes
+            reclamacao.to_dict()
+            for reclamacao in reclamacoes
         ]), 200
 
     except Exception as erro:
@@ -108,7 +111,6 @@ def buscar_reclamacao_route(id):
         return jsonify({
             "erro": str(erro)
         }), 404
-
 @reclamacao_bp.route("/minhas-reclamacoes", methods=["GET"])
 @jwt_required()
 def minhas_reclamacoes_route():
@@ -122,8 +124,8 @@ def minhas_reclamacoes_route():
         )
 
         return jsonify([
-            r.to_dict()
-            for r in reclamacoes
+            reclamacao.to_dict()
+            for reclamacao in reclamacoes
         ]), 200
 
     except Exception as erro:
@@ -131,7 +133,6 @@ def minhas_reclamacoes_route():
         return jsonify({
             "erro": str(erro)
         }), 500
-
 @reclamacao_bp.route("/reclamacoes/<int:id>/status", methods=["PATCH"])
 @jwt_required()
 @admin_required
@@ -141,19 +142,18 @@ def alterar_status_route(id):
 
         dados = request.get_json()
 
-        novo_status = dados.get("status")
-
-        validar_status(novo_status)
+        validar_status(dados)
 
         reclamacao = buscar_reclamacao_service(id)
 
         atualizar_status_service(
             reclamacao,
-            novo_status
+            dados["status"]
         )
 
         return jsonify({
-            "mensagem": "Status atualizado com sucesso."
+            "mensagem": "Status atualizado com sucesso.",
+            "status": reclamacao.status
         }), 200
 
     except ValueError as erro:
@@ -161,96 +161,3 @@ def alterar_status_route(id):
         return jsonify({
             "erro": str(erro)
         }), 400
-
-@reclamacao_bp.route("/reclamacoes/<int:id>", methods=["PUT"])
-@jwt_required()
-def atualizar_reclamacao_route(id):
-
-    try:
-
-        reclamacao = buscar_reclamacao_service(id)
-
-        usuario_id = get_jwt_identity()
-
-        if (
-            str(reclamacao.usuario_id) != str(usuario_id)
-            and not is_admin()
-        ):
-            return jsonify({
-                "erro": "Acesso negado."
-            }), 403
-
-        if reclamacao.status == "fechada":
-
-            return jsonify({
-                "erro": "Reclamação fechada não pode ser alterada."
-            }), 403
-
-        dados = request.get_json()
-
-        validar_atualizacao_reclamacao(dados)
-
-        atualizar_reclamacao_service(
-            reclamacao,
-            dados
-        )
-
-        return jsonify({
-            "mensagem": "Reclamação atualizada com sucesso."
-        }), 200
-
-    except ValueError as erro:
-
-        return jsonify({
-            "erro": str(erro)
-        }), 400
-
-@reclamacao_bp.route("/reclamacoes/<int:id>", methods=["DELETE"])
-@jwt_required()
-def deletar_reclamacao_route(id):
-
-    try:
-
-        reclamacao = buscar_reclamacao_service(id)
-
-        usuario_id = get_jwt_identity()
-
-        if (
-            str(reclamacao.usuario_id) != str(usuario_id)
-            and not is_admin()
-        ):
-            return jsonify({
-                "erro": "Acesso negado."
-            }), 403
-
-        excluir_reclamacao_service(
-            reclamacao
-        )
-
-        return jsonify({
-            "mensagem": "Reclamação removida com sucesso."
-        }), 200
-
-    except ValueError as erro:
-
-        return jsonify({
-            "erro": str(erro)
-        }), 404
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
