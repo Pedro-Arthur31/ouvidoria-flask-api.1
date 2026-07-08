@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from flask import Flask
 from flask_jwt_extended import JWTManager
-
+from sqlalchemy import text
 from extensions import db
 from config import Config
 
@@ -69,3 +69,14 @@ def home():
 
 if __name__ == "__main__":
     app.run()
+
+@app.route("/teste-db")
+def teste_db():
+
+    resultado = db.session.execute(
+        text("SELECT DATABASE();")
+    ).fetchone()
+
+    return {
+        "banco_atual": resultado[0]
+    }
