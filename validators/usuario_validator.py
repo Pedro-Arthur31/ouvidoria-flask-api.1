@@ -26,8 +26,10 @@ def validar_criacao_usuario(dados):
     if usuario:
         raise ValueError("Email já cadastrado.")
 
-    if not senha:
+    if senha is None:
         raise ValueError("Senha é obrigatória.")
+
+    senha = str(dados.get("senha")).strip()
 
     if len(senha) < 6:
         raise ValueError("Senha deve possuir pelo menos 6 caracteres.")
@@ -59,7 +61,12 @@ def validar_atualizacao_usuario(dados):
 
     if "senha" in dados:
 
-        senha = dados["senha"]
+        senha = dados.get("senha")
+
+        if senha is None:
+            raise ValueError("Senha é obrigatória.")
+
+        senha = str(senha)
 
         if len(senha) < 6:
             raise ValueError(

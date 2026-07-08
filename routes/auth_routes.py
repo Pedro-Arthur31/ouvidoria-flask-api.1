@@ -14,7 +14,38 @@ auth_bp = Blueprint(
 
 @auth_bp.route("/login", methods=["POST"])
 def login():
+    """ Login do usuário
+    ---
+    tags:
+      - Autenticação
 
+    consumes:
+      - application/json
+
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+              example: admin@email.com
+            senha:
+              type: string
+              example: "123456"
+
+    responses:
+      200:
+        description: Login realizado com sucesso
+
+      400:
+        description: Dados inválidos
+
+      401:
+        description: Email ou senha inválidos
+    """
     dados = request.get_json()
 
     if not dados:
@@ -29,6 +60,8 @@ def login():
         return jsonify({
             "erro": "Email é obrigatório."
         }), 400
+
+    senha = str(senha)
 
     if not senha:
         return jsonify({

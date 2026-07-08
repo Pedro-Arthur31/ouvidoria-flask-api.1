@@ -11,9 +11,13 @@ from routes.usuario_routes import usuario_bp
 from routes.reclamacao_routes import reclamacao_bp
 from routes.resposta_routes import resposta_bp
 
+from flasgger import Swagger
 
 app = Flask(__name__)
-
+app.config["SWAGGER"] = {
+    "title": "API Ouvidoria",
+    "uiversion": 3
+}
 
 app.config.from_object(Config)
 
@@ -21,7 +25,24 @@ app.config.from_object(Config)
 db.init_app(app)
 
 jwt = JWTManager(app)
+template = {
+    "swagger": "2.0",
+    "info": {
+        "title": "API Ouvidoria",
+        "description": "API REST desenvolvida com Flask, JWT e MySQL.",
+        "version": "1.0.0"
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "Digite: Bearer <seu_token>"
+        }
+    }
+}
 
+swagger = Swagger(app, template=template)
 
 
 app.register_blueprint(auth_bp)
@@ -47,4 +68,4 @@ def home():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()

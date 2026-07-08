@@ -31,7 +31,46 @@ reclamacao_bp = Blueprint(
 @reclamacao_bp.route("/reclamacoes", methods=["POST"])
 @jwt_required()
 def criar_reclamacao_route():
+    """
+    Criar uma nova reclamação
+    ---
+    tags:
+      - Reclamações
 
+    security:
+      - Bearer: []
+
+    consumes:
+      - application/json
+
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - titulo
+            - descricao
+          properties:
+            titulo:
+              type: string
+              example: Internet indisponível
+
+            descricao:
+              type: string
+              example: Estou sem internet desde ontem.
+
+    responses:
+      201:
+        description: Reclamação criada com sucesso
+
+      400:
+        description: Dados inválidos
+
+      401:
+        description: Usuário não autenticado
+    """
     try:
 
         dados = request.get_json()
@@ -59,7 +98,22 @@ def criar_reclamacao_route():
 @reclamacao_bp.route("/reclamacoes", methods=["GET"])
 @jwt_required()
 def listar_reclamacoes_route():
+    """
+    Lista reclamações
+    ---
+    tags:
+      - Reclamações
 
+    security:
+      - Bearer: []
+
+    responses:
+      200:
+        description: Lista de reclamações
+
+      401:
+        description: Não autenticado
+    """
     try:
 
         usuario_id = get_jwt_identity()
@@ -87,7 +141,32 @@ def listar_reclamacoes_route():
 @reclamacao_bp.route("/reclamacoes/<int:id>", methods=["GET"])
 @jwt_required()
 def buscar_reclamacao_route(id):
+    """
+    Buscar reclamação pelo ID
+    ---
+    tags:
+      - Reclamações
 
+    security:
+      - Bearer: []
+
+    parameters:
+      - in: path
+        name: id
+        type: integer
+        required: true
+        description: ID da reclamação
+
+    responses:
+      200:
+        description: Reclamação encontrada
+
+      403:
+        description: Acesso negado
+
+      404:
+        description: Reclamação não encontrada
+    """
     try:
 
         reclamacao = buscar_reclamacao_service(id)
@@ -114,7 +193,19 @@ def buscar_reclamacao_route(id):
 @reclamacao_bp.route("/minhas-reclamacoes", methods=["GET"])
 @jwt_required()
 def minhas_reclamacoes_route():
+    """
+    Lista as reclamações do usuário logado
+    ---
+    tags:
+      - Reclamações
 
+    security:
+      - Bearer: []
+
+    responses:
+      200:
+        description: Lista das reclamações do usuário
+    """
     try:
 
         usuario_id = get_jwt_identity()
@@ -137,7 +228,42 @@ def minhas_reclamacoes_route():
 @jwt_required()
 @admin_required
 def alterar_status_route(id):
+    """
+Alterar status da reclamação
+---
+tags:
+  - Reclamações
 
+security:
+  - Bearer: []
+
+parameters:
+  - in: path
+    name: id
+    type: integer
+    required: true
+
+  - in: body
+    name: body
+    schema:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          example: respondida
+
+responses:
+  200:
+    description: Status atualizado
+
+  400:
+    description: Status inválido
+
+  403:
+    description: Apenas administradores
+"""
     try:
 
         dados = request.get_json()
@@ -164,7 +290,44 @@ def alterar_status_route(id):
 @reclamacao_bp.route("/reclamacoes/<int:id>", methods=["PUT"])
 @jwt_required()
 def atualizar_reclamacao_route(id):
+    """
+    Atualiza uma reclamação
+    ---
+    tags:
+      - Reclamações
 
+    security:
+      - Bearer: []
+
+    parameters:
+      - in: path
+        name: id
+        type: integer
+        required: true
+
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            titulo:
+              type: string
+              example: Internet lenta
+
+            descricao:
+              type: string
+              example: A velocidade caiu bastante.
+
+    responses:
+      200:
+        description: Reclamação atualizada
+
+      403:
+        description: Sem permissão
+
+      404:
+        description: Reclamação não encontrada
+    """
     try:
 
         reclamacao = buscar_reclamacao_service(id)
@@ -205,7 +368,31 @@ def atualizar_reclamacao_route(id):
 @reclamacao_bp.route("/reclamacoes/<int:id>", methods=["DELETE"])
 @jwt_required()
 def excluir_reclamacao_route(id):
+    """
+    Excluir reclamação
+    ---
+    tags:
+      - Reclamações
 
+    security:
+      - Bearer: []
+
+    parameters:
+      - in: path
+        name: id
+        type: integer
+        required: true
+
+    responses:
+      200:
+        description: Reclamação removida
+
+      403:
+        description: Sem permissão
+
+      404:
+        description: Reclamação não encontrada
+    """
     try:
 
         reclamacao = buscar_reclamacao_service(id)

@@ -26,7 +26,45 @@ usuario_bp = Blueprint(
 
 @usuario_bp.route("/usuarios", methods=["POST"])
 def criar_usuario_route():
+    """
+    Cadastrar novo usuário
+    ---
+    tags:
+      - Usuários
 
+    consumes:
+      - application/json
+
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - nome
+            - email
+            - senha
+          properties:
+            nome:
+              type: string
+              example: Pedro Arthur
+
+            email:
+              type: string
+              example: pedro@email.com
+
+            senha:
+              type: string
+              example: "123456"
+
+    responses:
+      201:
+        description: Usuário criado com sucesso
+
+      400:
+        description: Dados inválidos
+    """
     try:
 
         dados = request.get_json()
@@ -55,7 +93,22 @@ def criar_usuario_route():
 @jwt_required()
 @admin_required
 def listar_usuarios_route():
+    """
+    Lista todos os usuários
+    ---
+    tags:
+      - Usuários
 
+    security:
+      - Bearer: []
+
+    responses:
+      200:
+        description: Lista de usuários
+
+      403:
+        description: Apenas administradores
+    """
     usuarios = listar_usuarios()
 
     return jsonify([
@@ -68,7 +121,28 @@ def listar_usuarios_route():
 @usuario_bp.route("/usuarios/<int:id>", methods=["GET"])
 @jwt_required()
 def buscar_usuario_route(id):
+    """
+    Busca um usuário pelo ID
+    ---
+    tags:
+      - Usuários
 
+    security:
+      - Bearer: []
+
+    parameters:
+      - in: path
+        name: id
+        type: integer
+        required: true
+
+    responses:
+      200:
+        description: Usuário encontrado
+
+      404:
+        description: Usuário não encontrado
+    """
     usuario_logado = get_jwt_identity()
 
     if str(usuario_logado) != str(id) and not is_admin():
@@ -92,7 +166,39 @@ def buscar_usuario_route(id):
 @usuario_bp.route("/usuarios/<int:id>", methods=["PUT"])
 @jwt_required()
 def atualizar_usuario_route(id):
+    """
+    Atualiza um usuário
+    ---
+    tags:
+      - Usuários
 
+    security:
+      - Bearer: []
+
+    parameters:
+      - in: path
+        name: id
+        type: integer
+        required: true
+
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            nome:
+              type: string
+
+            email:
+              type: string
+
+            senha:
+              type: string
+
+    responses:
+      200:
+        description: Usuário atualizado
+    """
     usuario = buscar_usuario(id)
 
     if not usuario:
@@ -125,7 +231,28 @@ def atualizar_usuario_route(id):
 @usuario_bp.route("/usuarios/<int:id>", methods=["DELETE"])
 @jwt_required()
 def excluir_usuario_route(id):
+    """
+    Remove um usuário
+    ---
+    tags:
+      - Usuários
 
+    security:
+      - Bearer: []
+
+    parameters:
+      - in: path
+        name: id
+        type: integer
+        required: true
+
+    responses:
+      200:
+        description: Usuário removido
+
+      404:
+        description: Usuário não encontrado
+    """
     usuario = buscar_usuario(id)
 
     if not usuario:
@@ -151,7 +278,19 @@ def excluir_usuario_route(id):
 @usuario_bp.route("/me", methods=["GET"])
 @jwt_required()
 def meu_perfil_route():
+    """
+    Perfil do usuário autenticado
+    ---
+    tags:
+      - Usuários
 
+    security:
+      - Bearer: []
+
+    responses:
+      200:
+        description: Perfil do usuário
+    """
     usuario_id = get_jwt_identity()
 
     usuario = buscar_usuario(usuario_id)
@@ -171,7 +310,22 @@ def meu_perfil_route():
 @jwt_required()
 @admin_required
 def painel_admin_route():
+    """
+    Painel administrativo
+    ---
+    tags:
+      - Administração
 
+    security:
+      - Bearer: []
+
+    responses:
+      200:
+        description: Acesso permitido
+
+      403:
+        description: Apenas administradores
+    """
     usuario_id = get_jwt_identity()
 
     usuario = buscar_usuario(usuario_id)

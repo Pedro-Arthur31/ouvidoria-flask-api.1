@@ -33,7 +33,49 @@ resposta_bp = Blueprint(
 @jwt_required()
 @admin_required
 def criar_resposta_route():
+    """
+    Criar uma resposta para uma reclamação
+    ---
+    tags:
+      - Respostas
 
+    security:
+      - Bearer: []
+
+    consumes:
+      - application/json
+
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - reclamacao_id
+            - mensagem
+          properties:
+            reclamacao_id:
+              type: integer
+              example: 1
+
+            mensagem:
+              type: string
+              example: Sua solicitação foi encaminhada ao setor responsável.
+
+    responses:
+      201:
+        description: Resposta criada com sucesso
+
+      400:
+        description: Dados inválidos
+
+      403:
+        description: Apenas administradores
+
+      404:
+        description: Reclamação não encontrada
+    """
     try:
 
         dados = request.get_json()
@@ -62,7 +104,29 @@ def criar_resposta_route():
 @resposta_bp.route("/reclamacoes/<int:id>/respostas", methods=["GET"])
 @jwt_required()
 def listar_respostas_route(id):
+    """
+    Lista todas as respostas de uma reclamação
+    ---
+    tags:
+      - Respostas
 
+    security:
+      - Bearer: []
+
+    parameters:
+      - in: path
+        name: id
+        type: integer
+        required: true
+        description: ID da reclamação
+
+    responses:
+      200:
+        description: Lista de respostas
+
+      404:
+        description: Reclamação não encontrada
+    """
     try:
 
         respostas = listar_respostas_reclamacao(id)
@@ -80,7 +144,28 @@ def listar_respostas_route(id):
 @resposta_bp.route("/respostas/<int:id>", methods=["GET"])
 @jwt_required()
 def buscar_resposta_route(id):
+    """
+    Buscar resposta pelo ID
+    ---
+    tags:
+      - Respostas
 
+    security:
+      - Bearer: []
+
+    parameters:
+      - in: path
+        name: id
+        type: integer
+        required: true
+
+    responses:
+      200:
+        description: Resposta encontrada
+
+      404:
+        description: Resposta não encontrada
+    """
     try:
 
         resposta = buscar_resposta(id)
@@ -98,7 +183,40 @@ def buscar_resposta_route(id):
 @jwt_required()
 @admin_required
 def atualizar_resposta_route(id):
+    """
+    Atualizar resposta
+    ---
+    tags:
+      - Respostas
 
+    security:
+      - Bearer: []
+
+    parameters:
+      - in: path
+        name: id
+        type: integer
+        required: true
+
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            mensagem:
+              type: string
+              example: A solicitação já foi resolvida.
+
+    responses:
+      200:
+        description: Resposta atualizada
+
+      403:
+        description: Apenas administradores
+
+      404:
+        description: Resposta não encontrada
+    """
     try:
 
         resposta = buscar_resposta(id)
@@ -125,7 +243,31 @@ def atualizar_resposta_route(id):
 @jwt_required()
 @admin_required
 def deletar_resposta_route(id):
+    """
+    Excluir resposta
+    ---
+    tags:
+      - Respostas
 
+    security:
+      - Bearer: []
+
+    parameters:
+      - in: path
+        name: id
+        type: integer
+        required: true
+
+    responses:
+      200:
+        description: Resposta removida
+
+      403:
+        description: Apenas administradores
+
+      404:
+        description: Resposta não encontrada
+    """
     try:
 
         resposta = buscar_resposta(id)

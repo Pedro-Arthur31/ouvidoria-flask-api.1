@@ -5,7 +5,7 @@ from models.usuario import Usuario
 
 
 def criar_usuario(nome, email, senha):
-
+    senha = str(senha)
     usuario = Usuario(
         nome=nome,
         email=email,
