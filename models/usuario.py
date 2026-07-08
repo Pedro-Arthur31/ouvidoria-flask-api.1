@@ -56,6 +56,6 @@ class Usuario(db.Model):
             "id": self.id,
             "nome": self.nome,
             "email": self.email,
-            "perfil": self.perfil,
+            "tipo": self.tipo,
             "data_criacao": self.data_criacao.strftime("%d/%m/%Y %H:%M")
         }

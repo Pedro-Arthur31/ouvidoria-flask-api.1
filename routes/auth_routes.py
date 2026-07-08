@@ -88,7 +88,7 @@ def login():
     token = create_access_token(
         identity=str(usuario.id),
         additional_claims={
-            "perfil": usuario.perfil
+            "tipo": usuario.tipo
         }
     )
 
