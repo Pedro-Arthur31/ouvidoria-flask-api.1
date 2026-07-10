@@ -3,25 +3,16 @@ from datetime import timedelta
 
 
 class Config:
-    database_url = os.getenv("DATABASE_URL")
 
-    if database_url:
-        database_url = database_url.replace(
-            "mysql://",
-            "mysql+pymysql://"
-        )
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
 
-        database_url = database_url.replace(
-            "mysql+mysqldb://",
-            "mysql+pymysql://"
-        )
-
-        database_url = database_url.replace(
-            "ssl-mode=REQUIRED",
-            "ssl=true"
-        )
-
-    SQLALCHEMY_DATABASE_URI = database_url
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "connect_args": {
+            "ssl": {
+                "ssl": True
+            }
+        }
+    }
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
