@@ -66,17 +66,3 @@ def home():
         "status": "online"
     }
 
-
-if __name__ == "__main__":
-    app.run()
-
-@app.route("/teste-db")
-def teste_db():
-
-    resultado = db.session.execute(
-        text("SELECT DATABASE();")
-    ).fetchone()
-
-    return {
-        "banco_atual": resultado[0]
-    }
