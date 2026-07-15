@@ -18,13 +18,13 @@ from validators.usuario_validator import (
 )
 
 usuario_bp = Blueprint(
-    "usuario",
+    "Usuário",
     __name__
 )
 
 
 
-@usuario_bp.route("/usuarios", methods=["POST"])
+@usuario_bp.route("/usuários", methods=["POST"])
 def criar_usuario_route():
     """
     Cadastrar novo usuário
@@ -60,10 +60,10 @@ def criar_usuario_route():
 
     responses:
       201:
-        description: Usuário criado com sucesso
+        description: Usuário criado com sucesso.
 
       400:
-        description: Dados inválidos
+        description: Dados inválidos.
     """
     try:
 
@@ -84,12 +84,12 @@ def criar_usuario_route():
     except ValueError as erro:
 
         return jsonify({
-            "erro": str(erro)
+            "Erro": str(erro)
         }), 400
 
 
 
-@usuario_bp.route("/usuarios", methods=["GET"])
+@usuario_bp.route("/usuários", methods=["GET"])
 @jwt_required()
 @admin_required
 def listar_usuarios_route():
@@ -118,7 +118,7 @@ def listar_usuarios_route():
 
 
 
-@usuario_bp.route("/usuarios/<int:id>", methods=["GET"])
+@usuario_bp.route("/usuários/<int:id>", methods=["GET"])
 @jwt_required()
 def buscar_usuario_route(id):
     """
@@ -138,23 +138,23 @@ def buscar_usuario_route(id):
 
     responses:
       200:
-        description: Usuário encontrado
+        description: Usuário encontrado.
 
       404:
-        description: Usuário não encontrado
+        description: Usuário não encontrado.
     """
     usuario_logado = get_jwt_identity()
 
     if str(usuario_logado) != str(id) and not is_admin():
         return jsonify({
-            "erro": "Acesso negado."
+            "Erro": "Acesso negado."
         }), 403
 
     usuario = buscar_usuario(id)
 
     if not usuario:
         return jsonify({
-            "erro": "Usuário não encontrado."
+            "Erro": "Usuário não encontrado."
         }), 404
 
     return jsonify(
@@ -163,7 +163,7 @@ def buscar_usuario_route(id):
 
 
 
-@usuario_bp.route("/usuarios/<int:id>", methods=["PUT"])
+@usuario_bp.route("/usuários/<int:id>", methods=["PUT"])
 @jwt_required()
 def atualizar_usuario_route(id):
     """
@@ -197,20 +197,20 @@ def atualizar_usuario_route(id):
 
     responses:
       200:
-        description: Usuário atualizado
+        description: Usuário atualizado.
     """
     usuario = buscar_usuario(id)
 
     if not usuario:
         return jsonify({
-            "erro": "Usuário não encontrado."
+            "Erro": "Usuário não encontrado."
         }), 404
 
     usuario_logado = get_jwt_identity()
 
     if str(usuario_logado) != str(id) and not is_admin():
         return jsonify({
-            "erro": "Acesso negado."
+            "Erro": "Acesso negado."
         }), 403
 
     dados = request.get_json()
@@ -223,12 +223,12 @@ def atualizar_usuario_route(id):
     )
 
     return jsonify({
-        "mensagem": "Usuário atualizado com sucesso."
+        "Mensagem": "Usuário atualizado com sucesso."
     }), 200
 
 
 
-@usuario_bp.route("/usuarios/<int:id>", methods=["DELETE"])
+@usuario_bp.route("/usuários/<int:id>", methods=["DELETE"])
 @jwt_required()
 def excluir_usuario_route(id):
     """
@@ -248,29 +248,29 @@ def excluir_usuario_route(id):
 
     responses:
       200:
-        description: Usuário removido
+        description: Usuário removido.
 
       404:
-        description: Usuário não encontrado
+        description: Usuário não encontrado.
     """
     usuario = buscar_usuario(id)
 
     if not usuario:
         return jsonify({
-            "erro": "Usuário não encontrado."
+            "Erro": "Usuário não encontrado."
         }), 404
 
     usuario_logado = get_jwt_identity()
 
     if str(usuario_logado) != str(id) and not is_admin():
         return jsonify({
-            "erro": "Acesso negado."
+            "Erro": "Acesso negado."
         }), 403
 
     excluir_usuario(usuario)
 
     return jsonify({
-        "mensagem": "Usuário removido com sucesso."
+        "Mensagem": "Usuário removido com sucesso."
     }), 200
 
 
@@ -279,7 +279,7 @@ def excluir_usuario_route(id):
 @jwt_required()
 def meu_perfil_route():
     """
-    Perfil do usuário autenticado
+    Perfil do usuário autenticado.
     ---
     tags:
       - Usuários
@@ -289,7 +289,7 @@ def meu_perfil_route():
 
     responses:
       200:
-        description: Perfil do usuário
+        description: Perfil do usuário.
     """
     usuario_id = get_jwt_identity()
 
@@ -297,7 +297,7 @@ def meu_perfil_route():
 
     if not usuario:
         return jsonify({
-            "erro": "Usuário não encontrado."
+            "Erro": "Usuário não encontrado."
         }), 404
 
     return jsonify(
@@ -321,10 +321,10 @@ def painel_admin_route():
 
     responses:
       200:
-        description: Acesso permitido
+        description: Acesso permitido.
 
       403:
-        description: Apenas administradores
+        description: Apenas administradores.
     """
     usuario_id = get_jwt_identity()
 
@@ -332,10 +332,10 @@ def painel_admin_route():
 
     if not usuario:
         return jsonify({
-            "erro": "Usuário não encontrado."
+            "Erro": "Usuário não encontrado."
         }), 404
 
     return jsonify({
-        "mensagem": f"Bem-vindo ao painel administrativo, {usuario.nome}!",
-        "usuario": usuario.to_dict()
+        "Mensagem": f"Bem-vindo ao painel administrativo, {usuario.nome}!",
+        "Usuário": usuario.to_dict()
     }), 200

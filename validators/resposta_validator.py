@@ -1,7 +1,7 @@
 def validar_criacao_resposta(dados):
 
     mensagem = dados.get("mensagem")
-    reclamacao_id = dados.get("reclamacao_id")
+    reclamacao_id = dados.get("reclamação_id")
 
     if not mensagem:
         raise ValueError(

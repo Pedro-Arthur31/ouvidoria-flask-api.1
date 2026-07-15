@@ -25,7 +25,7 @@ from validators.resposta_validator import (
 )
 
 resposta_bp = Blueprint(
-    "resposta",
+    "Resposta",
     __name__
 )
 
@@ -65,16 +65,16 @@ def criar_resposta_route():
 
     responses:
       201:
-        description: Resposta criada com sucesso
+        description: Resposta criada com sucesso.
 
       400:
-        description: Dados inválidos
+        description: Dados inválidos.
 
       403:
-        description: Apenas administradores
+        description: Apenas administradores.
 
       404:
-        description: Reclamação não encontrada
+        description: Reclamação não encontrada.
     """
     try:
 
@@ -83,11 +83,11 @@ def criar_resposta_route():
         validar_criacao_resposta(dados)
 
         reclamacao = buscar_reclamacao_service(
-            dados["reclamacao_id"]
+            dados["Reclamação_id"]
         )
 
         resposta = criar_resposta(
-            mensagem=dados["mensagem"],
+            mensagem=dados["Mensagem"],
             administrador_id=get_jwt_identity(),
             reclamacao=reclamacao
         )
@@ -99,9 +99,9 @@ def criar_resposta_route():
     except ValueError as erro:
 
         return jsonify({
-            "erro": str(erro)
+            "Erro": str(erro)
         }), 400
-@resposta_bp.route("/reclamacoes/<int:id>/respostas", methods=["GET"])
+@resposta_bp.route("/reclamações/<int:id>/respostas", methods=["GET"])
 @jwt_required()
 def listar_respostas_route(id):
     """
@@ -122,10 +122,10 @@ def listar_respostas_route(id):
 
     responses:
       200:
-        description: Lista de respostas
+        description: Lista de respostas.
 
       404:
-        description: Reclamação não encontrada
+        description: Reclamação não encontrada.
     """
     try:
 
@@ -139,7 +139,7 @@ def listar_respostas_route(id):
     except Exception as erro:
 
         return jsonify({
-            "erro": str(erro)
+            "Erro": str(erro)
         }), 500
 @resposta_bp.route("/respostas/<int:id>", methods=["GET"])
 @jwt_required()
@@ -161,10 +161,10 @@ def buscar_resposta_route(id):
 
     responses:
       200:
-        description: Resposta encontrada
+        description: Resposta encontrada.
 
       404:
-        description: Resposta não encontrada
+        description: Resposta não encontrada.
     """
     try:
 
@@ -177,7 +177,7 @@ def buscar_resposta_route(id):
     except ValueError as erro:
 
         return jsonify({
-            "erro": str(erro)
+            "Erro": str(erro)
         }), 404
 @resposta_bp.route("/respostas/<int:id>", methods=["PUT"])
 @jwt_required()
@@ -209,13 +209,13 @@ def atualizar_resposta_route(id):
 
     responses:
       200:
-        description: Resposta atualizada
+        description: Resposta atualizada.
 
       403:
-        description: Apenas administradores
+        description: Apenas administradores.
 
       404:
-        description: Resposta não encontrada
+        description: Resposta não encontrada.
     """
     try:
 
@@ -237,7 +237,7 @@ def atualizar_resposta_route(id):
     except ValueError as erro:
 
         return jsonify({
-            "erro": str(erro)
+            "Erro": str(erro)
         }), 400
 @resposta_bp.route("/respostas/<int:id>", methods=["DELETE"])
 @jwt_required()
@@ -260,13 +260,13 @@ def deletar_resposta_route(id):
 
     responses:
       200:
-        description: Resposta removida
+        description: Resposta removida.
 
       403:
-        description: Apenas administradores
+        description: Apenas administradores.
 
       404:
-        description: Resposta não encontrada
+        description: Resposta não encontrada.
     """
     try:
 
@@ -275,11 +275,11 @@ def deletar_resposta_route(id):
         excluir_resposta(resposta)
 
         return jsonify({
-            "mensagem": "Resposta removida com sucesso."
+            "Mensagem": "Resposta removida com sucesso."
         }), 200
 
     except ValueError as erro:
 
         return jsonify({
-            "erro": str(erro)
+            "Erro": str(erro)
         }), 404

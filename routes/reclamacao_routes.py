@@ -25,10 +25,10 @@ from validators.reclamacao_validator import (
 )
 
 reclamacao_bp = Blueprint(
-    "reclamacao",
+    "reclamação",
     __name__
 )
-@reclamacao_bp.route("/reclamacoes", methods=["POST"])
+@reclamacao_bp.route("/reclamações", methods=["POST"])
 @jwt_required()
 def criar_reclamacao_route():
     """
@@ -63,13 +63,13 @@ def criar_reclamacao_route():
 
     responses:
       201:
-        description: Reclamação criada com sucesso
+        description: Reclamação criada com sucesso.
 
       400:
-        description: Dados inválidos
+        description: Dados inválidos.
 
       401:
-        description: Usuário não autenticado
+        description: Usuário não autenticado.
     """
     try:
 
@@ -80,8 +80,8 @@ def criar_reclamacao_route():
         usuario_id = get_jwt_identity()
 
         reclamacao = criar_reclamacao_service(
-            titulo=dados["titulo"],
-            descricao=dados["descricao"],
+            titulo=dados["Título"],
+            descricao=dados["Descrição"],
             usuario_id=usuario_id
         )
 
@@ -92,10 +92,10 @@ def criar_reclamacao_route():
     except ValueError as erro:
 
         return jsonify({
-            "erro": str(erro)
+            "Erro": str(erro)
         }), 400
 
-@reclamacao_bp.route("/reclamacoes", methods=["GET"])
+@reclamacao_bp.route("/reclamações", methods=["GET"])
 @jwt_required()
 def listar_reclamacoes_route():
     """
@@ -109,10 +109,10 @@ def listar_reclamacoes_route():
 
     responses:
       200:
-        description: Lista de reclamações
+        description: Lista de reclamações.
 
       401:
-        description: Não autenticado
+        description: Não autenticado.
     """
     try:
 
@@ -136,9 +136,9 @@ def listar_reclamacoes_route():
     except Exception as erro:
 
         return jsonify({
-            "erro": str(erro)
+            "Erro": str(erro)
         }), 500
-@reclamacao_bp.route("/reclamacoes/<int:id>", methods=["GET"])
+@reclamacao_bp.route("/reclamções/<int:id>", methods=["GET"])
 @jwt_required()
 def buscar_reclamacao_route(id):
     """
@@ -159,13 +159,13 @@ def buscar_reclamacao_route(id):
 
     responses:
       200:
-        description: Reclamação encontrada
+        description: Reclamação encontrada.
 
       403:
-        description: Acesso negado
+        description: Acesso negado.
 
       404:
-        description: Reclamação não encontrada
+        description: Reclamação não encontrada.
     """
     try:
 
@@ -178,7 +178,7 @@ def buscar_reclamacao_route(id):
             and not is_admin()
         ):
             return jsonify({
-                "erro": "Acesso negado."
+                "Erro": "Acesso negado."
             }), 403
 
         return jsonify(
@@ -188,9 +188,9 @@ def buscar_reclamacao_route(id):
     except ValueError as erro:
 
         return jsonify({
-            "erro": str(erro)
+            "Erro": str(erro)
         }), 404
-@reclamacao_bp.route("/minhas-reclamacoes", methods=["GET"])
+@reclamacao_bp.route("/minhas-reclamações", methods=["GET"])
 @jwt_required()
 def minhas_reclamacoes_route():
     """
@@ -222,9 +222,9 @@ def minhas_reclamacoes_route():
     except Exception as erro:
 
         return jsonify({
-            "erro": str(erro)
+            "Erro": str(erro)
         }), 500
-@reclamacao_bp.route("/reclamacoes/<int:id>/status", methods=["PATCH"])
+@reclamacao_bp.route("/reclamações/<int:id>/status", methods=["PATCH"])
 @jwt_required()
 @admin_required
 def alterar_status_route(id):
@@ -256,38 +256,38 @@ parameters:
 
 responses:
   200:
-    description: Status atualizado
+    description: Status atualizado.
 
   400:
-    description: Status inválido
+    description: Status inválido.
 
   403:
-    description: Apenas administradores
+    description: Apenas administradores.
 """
     try:
 
         dados = request.get_json()
 
-        validar_status(dados["status"])
+        validar_status(dados["Status"])
 
         reclamacao = buscar_reclamacao_service(id)
 
         atualizar_status_service(
             reclamacao,
-            dados["status"]
+            dados["Status"]
         )
 
         return jsonify({
-            "mensagem": "Status atualizado com sucesso.",
-            "status": reclamacao.status
+            "Mensagem": "Status atualizado com sucesso.",
+            "Status": reclamacao.status
         }), 200
 
     except ValueError as erro:
 
         return jsonify({
-            "erro": str(erro)
+            "Erro": str(erro)
         }), 400
-@reclamacao_bp.route("/reclamacoes/<int:id>", methods=["PUT"])
+@reclamacao_bp.route("/reclamações/<int:id>", methods=["PUT"])
 @jwt_required()
 def atualizar_reclamacao_route(id):
     """
@@ -320,13 +320,13 @@ def atualizar_reclamacao_route(id):
 
     responses:
       200:
-        description: Reclamação atualizada
+        description: Reclamação atualizada.
 
       403:
-        description: Sem permissão
+        description: Sem permissão.
 
       404:
-        description: Reclamação não encontrada
+        description: Reclamação não encontrada.
     """
     try:
 
@@ -339,12 +339,12 @@ def atualizar_reclamacao_route(id):
             and not is_admin()
         ):
             return jsonify({
-                "erro": "Acesso negado."
+                "Erro": "Acesso negado."
             }), 403
 
-        if reclamacao.status == "fechada":
+        if reclamacao.status == "Fechada":
             return jsonify({
-                "erro": "Reclamação fechada não pode ser alterada."
+                "Erro": "Reclamação fechada não pode ser alterada."
             }), 403
 
         dados = request.get_json()
@@ -357,15 +357,15 @@ def atualizar_reclamacao_route(id):
         )
 
         return jsonify({
-            "mensagem": "Reclamação atualizada com sucesso."
+            "Mensagem": "Reclamação atualizada com sucesso."
         }), 200
 
     except ValueError as erro:
 
         return jsonify({
-            "erro": str(erro)
+            "Erro": str(erro)
         }), 400
-@reclamacao_bp.route("/reclamacoes/<int:id>", methods=["DELETE"])
+@reclamacao_bp.route("/reclamações/<int:id>", methods=["DELETE"])
 @jwt_required()
 def excluir_reclamacao_route(id):
     """
@@ -385,13 +385,13 @@ def excluir_reclamacao_route(id):
 
     responses:
       200:
-        description: Reclamação removida
+        description: Reclamação removida.
 
       403:
-        description: Sem permissão
+        description: Sem permissão.
 
       404:
-        description: Reclamação não encontrada
+        description: Reclamação não encontrada.
     """
     try:
 
@@ -404,7 +404,7 @@ def excluir_reclamacao_route(id):
             and not is_admin()
         ):
             return jsonify({
-                "erro": "Acesso negado."
+                "Erro": "Acesso negado."
             }), 403
 
         excluir_reclamacao_service(
@@ -412,11 +412,11 @@ def excluir_reclamacao_route(id):
         )
 
         return jsonify({
-            "mensagem": "Reclamação removida com sucesso."
+            "Mensagem": "Reclamação removida com sucesso."
         }), 200
 
     except ValueError as erro:
 
         return jsonify({
-            "erro": str(erro)
+            "Erro": str(erro)
         }), 404

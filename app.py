@@ -61,8 +61,8 @@ with app.app_context():
 @app.route("/")
 def home():
     return {
-        "mensagem": "API da Ouvidoria funcionando.",
-        "versao": "1.0.0",
-        "status": "online"
+        "Mensagem": "API da Ouvidoria funcionando.",
+        "Versao": "1.0.0",
+        "Status": "online"
     }
 

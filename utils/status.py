@@ -1,8 +1,8 @@
 class StatusReclamacao:
-    ABERTA = "aberta"
-    EM_ANDAMENTO = "em_andamento"
-    RESPONDIDA = "respondida"
-    FECHADA = "fechada"
+    ABERTA = "Aberta"
+    EM_ANDAMENTO = "Em_andamento"
+    RESPONDIDA = "Respondida"
+    FECHADA = "Fechada"
 
 
 STATUS_VALIDOS = [

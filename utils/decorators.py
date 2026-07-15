@@ -12,7 +12,7 @@ def admin_required(fn):
         claims = get_jwt()
 
         if claims.get("tipo") != "admin":
-            return {"erro": "Apenas administradores podem acessar."}, 403
+            return {"Erro": "Apenas administradores podem acessar."}, 403
 
         return fn(*args, **kwargs)
 

@@ -49,11 +49,11 @@ def atualizar_reclamacao_service(
         dados
 ):
 
-    if "titulo" in dados:
-        reclamacao.titulo = dados["titulo"]
+    if "Título" in dados:
+        reclamacao.titulo = dados["Título"]
 
-    if "descricao" in dados:
-        reclamacao.descricao = dados["descricao"]
+    if "Descrição" in dados:
+        reclamacao.descricao = dados["Descrição"]
 
     db.session.commit()
 

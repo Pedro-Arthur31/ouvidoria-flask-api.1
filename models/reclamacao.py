@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 class Reclamacao(db.Model):
-    __tablename__ = "reclamacoes"
+    __tablename__ = "Reclamações"
 
     id = db.Column(
         db.Integer,
@@ -23,7 +23,7 @@ class Reclamacao(db.Model):
     status = db.Column(
         db.String(30),
         nullable=False,
-        default="aberta"
+        default="Aberta"
     )
 
     data_criacao = db.Column(
@@ -34,28 +34,28 @@ class Reclamacao(db.Model):
 
     usuario_id = db.Column(
         db.Integer,
-        db.ForeignKey("usuarios.id"),
+        db.ForeignKey("Usuários.id"),
         nullable=False
     )
 
     usuario = db.relationship(
-        "Usuario",
-        back_populates="reclamacoes"
+        "Usuário",
+        back_populates="Reclamações"
     )
 
     respostas = db.relationship(
         "Resposta",
-        back_populates="reclamacao",
+        back_populates="Reclamação",
         lazy=True,
         cascade="all, delete-orphan"
     )
 
     def to_dict(self):
         return {
-            "id": self.id,
-            "titulo": self.titulo,
-            "descricao": self.descricao,
-            "status": self.status,
-            "usuario_id": self.usuario_id,
-            "data_criacao": self.data_criacao.strftime("%d/%m/%Y %H:%M")
+            "Id": self.id,
+            "Título": self.titulo,
+            "Descricão": self.descricao,
+            "Status": self.status,
+            "Usuário_id": self.usuario_id,
+            "Data_criacão": self.data_criacao.strftime("%d/%m/%Y %H:%M")
         }

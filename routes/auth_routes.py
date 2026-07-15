@@ -38,34 +38,34 @@ def login():
 
     responses:
       200:
-        description: Login realizado com sucesso
+        description: Login realizado com sucesso.
 
       400:
-        description: Dados inválidos
+        description: Dados inválidos.
 
       401:
-        description: Email ou senha inválidos
+        description: Email ou senha inválidos.
     """
     dados = request.get_json()
 
     if not dados:
         return jsonify({
-            "erro": "JSON não enviado."
+            "Erro": "Dados não enviado."
         }), 400
 
-    email = dados.get("email")
-    senha = dados.get("senha")
+    email = dados.get("Email")
+    senha = dados.get("Senha")
 
     if not email:
         return jsonify({
-            "erro": "Email é obrigatório."
+            "Erro": "Email é obrigatório."
         }), 400
 
     senha = str(senha)
 
     if not senha:
         return jsonify({
-            "erro": "Senha é obrigatória."
+            "Erro": "Senha é obrigatória."
         }), 400
 
     usuario = Usuario.query.filter_by(
@@ -74,7 +74,7 @@ def login():
 
     if not usuario:
         return jsonify({
-            "erro": "Email ou senha inválidos."
+            "Erro": "Email ou senha inválidos."
         }), 401
 
     if not check_password_hash(
@@ -82,17 +82,17 @@ def login():
         senha
     ):
         return jsonify({
-            "erro": "Email ou senha inválidos."
+            "Erro": "Email ou senha inválidos."
         }), 401
 
     token = create_access_token(
         identity=str(usuario.id),
         additional_claims={
-            "tipo": usuario.tipo
+            "Tipo": usuario.tipo
         }
     )
 
     return jsonify({
-        "access_token": token,
-        "usuario": usuario.to_dict()
+        "Access_token": token,
+        "Usuário": usuario.to_dict()
     }), 200

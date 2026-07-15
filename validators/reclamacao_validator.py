@@ -3,8 +3,8 @@ from utils.status import STATUS_VALIDOS
 
 def validar_criacao_reclamacao(dados):
 
-    titulo = dados.get("titulo")
-    descricao = dados.get("descricao")
+    titulo = dados.get("Título")
+    descricao = dados.get("Descricão")
 
     if not titulo:
         raise ValueError(
@@ -34,9 +34,9 @@ def validar_criacao_reclamacao(dados):
 
 def validar_atualizacao_reclamacao(dados):
 
-    if "titulo" in dados:
+    if "título" in dados:
 
-        titulo = dados["titulo"]
+        titulo = dados["título"]
 
         if not titulo.strip():
             raise ValueError("Título inválido.")
@@ -46,9 +46,9 @@ def validar_atualizacao_reclamacao(dados):
                 "Título muito curto."
             )
 
-    if "descricao" in dados:
+    if "descrição" in dados:
 
-        descricao = dados["descricao"]
+        descricao = dados["descrição"]
 
         if not descricao.strip():
             raise ValueError(
